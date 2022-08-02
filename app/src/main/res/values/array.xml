@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <string-array name="list이름">
+       <item>아버지 성함은?</item>
+       <item>어머니 성함은?</item>
+       <item>제일 처음 해 본 게임 이름은?</item>
+       <item>가장 좋아하는 음식은?</item>
+       <item>가장 좋아하는 색깔은?</item>
+       <item>제일 처음 사 본 주식 이름은?</item>
+   </string-array>
+</resources>
