@@ -14,6 +14,7 @@ public class geoActivity {
     private static String GEOCODE_URL =  "https://dapi.kakao.com/v2/local/search/address.json?query=";
     private static String GEOCODE_USER_INFO = "KakaoAK " + "7957e36ee6a611a01e2038370c4749e5";
     String add;
+    String addName,x,y;
 
     geoActivity(Editable add) {
         this.add = String.valueOf(add);
@@ -24,6 +25,14 @@ public class geoActivity {
             }
         }.start();
 
+    }
+
+    String[] getInfo(){
+        String[] info = new String[3];
+        info[0] = addName;
+        info[1] = y;
+        info[2] = x;
+        return info;
     }
 
     void searchMap() {
@@ -49,16 +58,31 @@ public class geoActivity {
 
             String inputLine;
             String response = new String();
-            String temp[] = new String[3];
+            String temp[] = new String[30];
 
             while ((inputLine = in.readLine()) != null) {
                 response+=inputLine;
             }
 
             //response 객체를 출력해보자
+            if(response.contains("x")){
+                //주소지 찾기
+                temp = response.split("\"address_name\":");
+                temp = temp[2].split("\"");
+                addName = temp[1];
+                
+                //x,y 위경도 좌표찾기
+                temp = response.split("\"x\":");
+                temp = temp[1].split("\"");
+                x = temp[1];
 
-            temp = response.split("\"address_name\":");
-            System.out.println(temp[2]);
+                temp = response.split("\"y\":");
+                temp = temp[1].split("\"");
+                y = temp[1];
+
+
+            }
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

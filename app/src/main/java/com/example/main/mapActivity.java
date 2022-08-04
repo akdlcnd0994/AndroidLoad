@@ -1,14 +1,19 @@
 package com.example.main;
 
+import static java.lang.Thread.sleep;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +43,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     Button Search;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION};
+    String[] info = new String[3];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +53,13 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
         mapViewContainer.addView(mapView);
         mapView.setMapViewEventListener(this);
-        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
+
+        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(location.getLatitude(),location.getLongitude()),true);
+
+
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
         }else {
@@ -65,11 +77,49 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
             @Override
             public void onClick(View v) {
                 geoActivity geo = new geoActivity(EditSearch.getText());
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                info = geo.getInfo();
 
+                if(info[0] == null){
+                    Toast.makeText(getApplicationContext(),"주소를 찾지 못했습니다. 다시 시도하거나 주소를 정확히 입력해주세요.",Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    showMsg(info);
+                }
             }
         });
     }
 
+    public void showMsg(String info[]){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("안내");
+        builder.setMessage(info[0]+"\n 찾으시는 주소가 맞습니까?");
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+
+        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                MapPoint mp = MapPoint.mapPointWithGeoCoord(Double.parseDouble(info[1]),Double.parseDouble(info[2]));
+                //주소로 이동처리
+                mapView.setMapCenterPoint(mp,true);
+
+            }
+        });
+
+        builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"주소를 조금 더 상세히 입력해주세요.",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 
 
 
@@ -81,7 +131,11 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
 
     @Override
     public void onCurrentLocationUpdate(MapView mapView, MapPoint currentLocation, float accuracyInMeters) {
+        //주소로 이동처리
+
         MapPoint.GeoCoordinate mapPointGeo = currentLocation.getMapPointGeoCoord();
+
+
         Log.i(LOG_TAG, String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)", mapPointGeo.latitude, mapPointGeo.longitude, accuracyInMeters));
     }
     @Override
