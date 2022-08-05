@@ -19,16 +19,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,7 +47,12 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
     private ViewGroup mapViewContainer;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    Button Search;
+    Button Search,post,check;
+    ImageButton Write,x;
+    EditText EditTitle, EditContent,EditAdd;
+    TextView text;
+    Double lon=700.0, lat=700.0;
+    ConstraintLayout f;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION};
     String[] info = new String[3];
     @Override
@@ -71,7 +82,18 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
 
     void init(){
         Search = (Button)findViewById(R.id.searchBtn);
+        check = (Button)findViewById(R.id.checkAdd);
+        post = (Button)findViewById(R.id.regPost);
+        text = (TextView)findViewById(R.id.address);
+        Write = (ImageButton) findViewById(R.id.writeButton);
+        x = (ImageButton)findViewById(R.id.XButton);
+        f = (ConstraintLayout)findViewById(R.id.frame);
+        EditTitle = (EditText)findViewById(R.id.EditTitle);
+        EditContent = (EditText)findViewById(R.id.EditContent);
+        EditAdd = (EditText)findViewById(R.id.EditAdd);
+
         EditText EditSearch = (EditText)findViewById(R.id.EditSearch);
+        f.setVisibility(View.INVISIBLE);
         Search.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -92,7 +114,92 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                 }
             }
         });
+
+        post.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(lat!=700.0) {
+
+
+                    String title = String.valueOf(EditTitle.getText());
+                    String content = String.valueOf(EditContent.getText());
+                    String latitude = String.valueOf(lat);
+                    String longitude = String.valueOf(lon);
+
+                    System.out.println("title = " + title + "\ncontent = "+ content+"\n위도 = "+ latitude + "\n경도 = "+longitude);
+                }
+            }
+        });
+
+        check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                geoActivity geo = new geoActivity(EditAdd.getText());
+                try {
+                    sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                info = geo.getInfo();
+
+                if(info[0] == null){
+                    Toast.makeText(getApplicationContext(),"주소를 찾지 못했습니다. 다시 시도하거나 주소를 정확히 입력해주세요.",Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    checkMsg(info);
+                }
+            }
+        });
+
+        Write.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(f.getVisibility()==View.INVISIBLE){
+                    f.setVisibility(View.VISIBLE);
+                }
+                else{
+                    f.setVisibility(View.INVISIBLE);
+                }
+
+            }
+        }
+    );
+        x.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                f.setVisibility(View.INVISIBLE);
+            }
+        });
     }
+
+
+
+    public void checkMsg(String info[]){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("안내");
+        builder.setMessage(info[0]+"\n 찾으시는 주소가 맞습니까?");
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+
+        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                lat = Double.parseDouble(info[1]);
+                lon = Double.parseDouble(info[2]);
+                text.setText("현재주소\n"+info[0]);
+            }
+        });
+
+        builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"주소를 조금 더 상세히 입력해주세요.",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
 
     public void showMsg(String info[]){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
