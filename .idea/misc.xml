@@ -3,12 +3,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1355" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/border.xml" value="0.1175" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/confirm_account.xml" value="0.1175" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/confirm_list.xml" value="0.1175" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/confirm_map.xml" value="0.1175" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/confirm_refresh.xml" value="0.1175" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/confirm_review.xml" value="0.1175" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/confirm_write.xml" value="0.1175" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1355" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/drawable/taedoori.xml" value="0.1355" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/layout/login.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/layout/map.xml" value="0.33" />
         <entry key="..\:/Users/user/AndroidStudioProjects/AndroidLoad/app/src/main/res/layout/register.xml" value="0.17806484295845998" />
         <entry key="..\:/Users/user/AndroidStudioProjects/Main/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2985" />

@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -19,8 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,70 +29,139 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
-import org.w3c.dom.Text;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.concurrent.ExecutionException;
 
 
-public class mapActivity extends AppCompatActivity implements MapView.CurrentLocationEventListener, MapView.MapViewEventListener{
+public class mapActivity extends AppCompatActivity implements MapView.CurrentLocationEventListener, MapView.MapViewEventListener, MapView.POIItemEventListener {
     private static final String LOG_TAG = "mapActivity";
     private MapView mapView;
     private ViewGroup mapViewContainer;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    Button Search,post,check;
-    ImageButton Write,x;
-    EditText EditTitle, EditContent,EditAdd;
-    TextView text;
-    Double lon=700.0, lat=700.0;
-    ConstraintLayout f;
-    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION};
+    Button Search, post, check;
+    ImageButton Write, x, refresh, x2, x3;
+    String nickname, address;
+    EditText EditTitle, EditContent, EditAdd;
+    TextView text, textv, titleday, cont;
+    Double lon = 700.0, lat = 700.0;
+    ConstraintLayout listLayout, f, paper;
+    LinearLayout list;
+
+
+
+    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION};
     String[] info = new String[3];
+    ArrayList<String[]> dbinfo = new ArrayList<String[]>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map);
-
         mapView = new MapView(this);
         mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
         mapViewContainer.addView(mapView);
         mapView.setMapViewEventListener(this);
+        mapView.setPOIItemEventListener(this);
+
         mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
 
-        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(location.getLatitude(),location.getLongitude()),true);
+        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(location.getLatitude(), location.getLongitude()), true);
 
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
-        }else {
+        } else {
             checkRunTimePermission();
         }
-
+        marking();
         init();
     }
 
-    void init(){
-        Search = (Button)findViewById(R.id.searchBtn);
-        check = (Button)findViewById(R.id.checkAdd);
-        post = (Button)findViewById(R.id.regPost);
-        text = (TextView)findViewById(R.id.address);
-        Write = (ImageButton) findViewById(R.id.writeButton);
-        x = (ImageButton)findViewById(R.id.XButton);
-        f = (ConstraintLayout)findViewById(R.id.frame);
-        EditTitle = (EditText)findViewById(R.id.EditTitle);
-        EditContent = (EditText)findViewById(R.id.EditContent);
-        EditAdd = (EditText)findViewById(R.id.EditAdd);
+    void marking() {
+        String[] sp;
+        String[] temp;
 
-        EditText EditSearch = (EditText)findViewById(R.id.EditSearch);
+        String result;
+        reviewListActivity task = new reviewListActivity();
+
+
+        try {
+            result = task.execute().get();
+            dbinfo.clear();
+            if(!result.equals("작성된 글이 없습니다.")) {
+                sp = result.split("@#@~#!#@#~#%");
+                for (int i = 0; i < sp.length; i++) {
+                    temp = sp[i].split("§§§§§§§%~#");
+
+                    dbinfo.add(new String[]{temp[0],temp[1],temp[2],temp[3],temp[4], temp[5], temp[6], temp[7]});
+
+                    int n = Integer.parseInt(temp[0]); // 리뷰번호
+                    String title = temp[1]; //제목
+                    String content = temp[2]; //내용
+                    Double lat = Double.valueOf(temp[3]); //위도
+                    Double lon = Double.valueOf(temp[4]); //경도
+                    String nick = temp[5];
+                    String add = temp[6];
+                    String fNow = temp[7];
+
+                    MapPOIItem marker = new MapPOIItem();
+                    MapPoint mp = MapPoint.mapPointWithGeoCoord(lon, lat);
+
+                    marker.setItemName(add);
+                    marker.setTag(0);
+                    marker.setMapPoint(mp);
+                    marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
+                    marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+
+
+
+
+                    mapView.addPOIItem(marker);
+                }
+            }
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    ;
+
+    void init() {
+        Search = (Button) findViewById(R.id.searchBtn);
+        check = (Button) findViewById(R.id.checkAdd);
+        post = (Button) findViewById(R.id.regPost);
+        text = (TextView) findViewById(R.id.address);
+        titleday = (TextView) findViewById(R.id.titleday);
+        cont = (TextView) findViewById(R.id.cont);
+        refresh = (ImageButton) findViewById(R.id.refresh);
+        Write = (ImageButton) findViewById(R.id.writeButton);
+        x = (ImageButton) findViewById(R.id.XButton);
+        x2 = (ImageButton) findViewById(R.id.XButton2);
+        x3 = (ImageButton) findViewById(R.id.XButton3);
+        f = (ConstraintLayout) findViewById(R.id.frame);
+        EditTitle = (EditText) findViewById(R.id.EditTitle);
+        EditContent = (EditText) findViewById(R.id.EditContent);
+        EditAdd = (EditText) findViewById(R.id.EditAdd);
+        listLayout = (ConstraintLayout) findViewById(R.id.listLayout);
+        EditText EditSearch = (EditText) findViewById(R.id.EditSearch);
+        textv = (TextView)findViewById(R.id.textv);
         f.setVisibility(View.INVISIBLE);
-        Search.setOnClickListener(new View.OnClickListener(){
+        list = (LinearLayout) findViewById(R.id.list);
+        paper = (ConstraintLayout) findViewById(R.id.paper);
+        paper.setVisibility(View.INVISIBLE);
+
+
+        Search.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -106,30 +173,52 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                 }
                 info = geo.getInfo();
 
-                if(info[0] == null){
-                    Toast.makeText(getApplicationContext(),"주소를 찾지 못했습니다. 다시 시도하거나 주소를 정확히 입력해주세요.",Toast.LENGTH_SHORT).show();
-                }
-                else {
+                if (info[0] == null) {
+                    Toast.makeText(getApplicationContext(), "주소를 찾지 못했습니다. 다시 시도하거나 주소를 정확히 입력해주세요.", Toast.LENGTH_SHORT).show();
+                } else {
                     showMsg(info);
                 }
             }
         });
 
+
+        refresh.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+//                if (listLayout.getVisibility() == View.INVISIBLE) {
+//                    listLayout.setVisibility(View.VISIBLE);
+//                } else {
+//                    listLayout.setVisibility(View.INVISIBLE);
+//                }
+                marking();
+            }
+        });
+
+
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(lat!=700.0) {
+                String result;
+                if (lat != 700.0) {
 
-
+                    nickname = getIntent().getStringExtra("nickname");
                     String title = String.valueOf(EditTitle.getText());
                     String content = String.valueOf(EditContent.getText());
                     String latitude = String.valueOf(lat);
                     String longitude = String.valueOf(lon);
-
-                    System.out.println("title = " + title + "\ncontent = "+ content+"\n위도 = "+ latitude + "\n경도 = "+longitude);
+                    reviewActivity task = new reviewActivity();
+                    try {
+                        result = task.execute(title, content, longitude, latitude, nickname, address).get();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
+
 
         check.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,42 +231,52 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                 }
                 info = geo.getInfo();
 
-                if(info[0] == null){
-                    Toast.makeText(getApplicationContext(),"주소를 찾지 못했습니다. 다시 시도하거나 주소를 정확히 입력해주세요.",Toast.LENGTH_SHORT).show();
-                }
-                else {
+                if (info[0] == null) {
+                    Toast.makeText(getApplicationContext(), "주소를 찾지 못했습니다. 다시 시도하거나 주소를 정확히 입력해주세요.", Toast.LENGTH_SHORT).show();
+                } else {
                     checkMsg(info);
                 }
             }
         });
 
         Write.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(f.getVisibility()==View.INVISIBLE){
-                    f.setVisibility(View.VISIBLE);
-                }
-                else{
-                    f.setVisibility(View.INVISIBLE);
-                }
-
-            }
-        }
-    );
+                                     @Override
+                                     public void onClick(View v) {
+                                         f.bringToFront();
+                                         if (f.getVisibility() == View.INVISIBLE) {
+                                             f.setVisibility(View.VISIBLE);
+                                         } else {
+                                             f.setVisibility(View.INVISIBLE);
+                                         }
+                                     }
+                                 }
+        );
         x.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 f.setVisibility(View.INVISIBLE);
             }
         });
+        x2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listLayout.setVisibility(View.INVISIBLE);
+                paper.setVisibility(View.INVISIBLE);
+            }
+        });
+        x3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                paper.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
 
-
-    public void checkMsg(String info[]){
+    public void checkMsg(String info[]) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("안내");
-        builder.setMessage(info[0]+"\n 찾으시는 주소가 맞습니까?");
+        builder.setMessage(info[0] + "\n 찾으시는 주소가 맞습니까?");
         builder.setIcon(android.R.drawable.ic_dialog_alert);
 
         builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
@@ -185,14 +284,15 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
             public void onClick(DialogInterface dialog, int which) {
                 lat = Double.parseDouble(info[1]);
                 lon = Double.parseDouble(info[2]);
-                text.setText("현재주소\n"+info[0]);
+                address = info[0];
+                text.setText("현재주소\n" + info[0]);
             }
         });
 
         builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getApplicationContext(),"주소를 조금 더 상세히 입력해주세요.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "주소를 조금 더 상세히 입력해주세요.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -201,18 +301,18 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
     }
 
 
-    public void showMsg(String info[]){
+    public void showMsg(String info[]) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("안내");
-        builder.setMessage(info[0]+"\n 찾으시는 주소가 맞습니까?");
+        builder.setMessage(info[0] + "\n 찾으시는 주소가 맞습니까?");
         builder.setIcon(android.R.drawable.ic_dialog_alert);
 
         builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                MapPoint mp = MapPoint.mapPointWithGeoCoord(Double.parseDouble(info[1]),Double.parseDouble(info[2]));
+                MapPoint mp = MapPoint.mapPointWithGeoCoord(Double.parseDouble(info[1]), Double.parseDouble(info[2]));
                 //주소로 이동처리
-                mapView.setMapCenterPoint(mp,true);
+                mapView.setMapCenterPoint(mp, true);
 
             }
         });
@@ -220,14 +320,13 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getApplicationContext(),"주소를 조금 더 상세히 입력해주세요.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "주소를 조금 더 상세히 입력해주세요.", Toast.LENGTH_SHORT).show();
             }
         });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
 
 
     @Override
@@ -242,9 +341,9 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
 
         MapPoint.GeoCoordinate mapPointGeo = currentLocation.getMapPointGeoCoord();
 
-
         Log.i(LOG_TAG, String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)", mapPointGeo.latitude, mapPointGeo.longitude, accuracyInMeters));
     }
+
     @Override
     public void onRequestPermissionsResult(int permsRequestCode,
                                            @NonNull String[] permissions,
@@ -305,14 +404,14 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
-    void checkRunTimePermission(){
+    void checkRunTimePermission() {
 
         //런타임 퍼미션 처리
         // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED ) {
+        if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED) {
             // 2. 이미 퍼미션을 가지고 있다면
             // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
             // 3.  위치 값을 가져올 수 있음
@@ -357,6 +456,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         });
         builder.create().show();
     }
+
     @Override
     public void onCurrentLocationDeviceHeadingUpdate(MapView mapView, float v) {
 
@@ -414,6 +514,54 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
 
     @Override
     public void onMapViewMoveFinished(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
+
+    }
+
+    @Override
+    public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
+        //여기 수정해야됨 !!!
+        list.removeAllViewsInLayout();
+        for(int i=0;i<dbinfo.size();i++) {
+            if (dbinfo.get(i)[6].equals(mapPOIItem.getItemName())){
+                LinearLayout.LayoutParams pa = new LinearLayout.LayoutParams(800,200);
+                pa.setMarginStart(70);
+                System.out.println("번호 = "+dbinfo.get(i)[0] + "제목 = " + dbinfo.get(i)[1] + "내용 = " + dbinfo.get(i)[2]);
+                //버튼 동적생성하고 list 비져블 처리
+                listLayout.bringToFront();
+                listLayout.setVisibility(View.VISIBLE);
+                Button b = new Button(this);
+                b.setText("제목 : " + dbinfo.get(i)[1] + "\n작성자 : " + dbinfo.get(i)[5] + "\n작성일 : " + dbinfo.get(i)[7]);
+                int tempI = i;
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        titleday.setText("제목 : " + dbinfo.get(tempI)[1] + "\n작성자 : " + dbinfo.get(tempI)[5] + "\n작성일 : " + dbinfo.get(tempI)[7]);
+                        cont.setText(dbinfo.get(tempI)[2]);
+                        paper.bringToFront();
+                        paper.setVisibility(View.VISIBLE);
+
+                    }
+                });
+
+                list.addView(b, pa);
+
+
+            }
+        }
+    }
+
+    @Override
+    public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
+
+    }
+
+    @Override
+    public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
 
     }
 }
