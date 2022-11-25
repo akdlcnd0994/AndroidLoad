@@ -14,6 +14,7 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +34,8 @@ import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.concurrent.ExecutionException;
@@ -44,13 +47,13 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
     private ViewGroup mapViewContainer;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    Button Search, post, check, up, report;
-    ImageButton Write, x, refresh, x2, x3;
+    Button Search, post, check, up, reportBtn, repBtn;
+    ImageButton Write, x, refresh, x2, x3, x4;
     String nickname, address, revNum;
-    EditText EditTitle, EditContent, EditAdd;
+    EditText EditTitle, EditContent, EditAdd, repContent, repTitle;
     TextView text, textv, titleday, cont;
     Double lon = 700.0, lat = 700.0;
-    ConstraintLayout listLayout, f, paper;
+    ConstraintLayout listLayout, f, paper,report;
     LinearLayout list;
 
 
@@ -139,8 +142,9 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
 
     void init() {
         Search = (Button) findViewById(R.id.searchBtn);
+        repBtn = (Button) findViewById(R.id.repBtn);
         up = (Button) findViewById(R.id.upBtn);
-        report = (Button) findViewById(R.id.report);
+        reportBtn = (Button) findViewById(R.id.reportBtn);
         check = (Button) findViewById(R.id.checkAdd);
         post = (Button) findViewById(R.id.regPost);
         text = (TextView) findViewById(R.id.address);
@@ -151,6 +155,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         x = (ImageButton) findViewById(R.id.XButton);
         x2 = (ImageButton) findViewById(R.id.XButton2);
         x3 = (ImageButton) findViewById(R.id.XButton3);
+        x4 = (ImageButton) findViewById(R.id.XButton4);
         f = (ConstraintLayout) findViewById(R.id.frame);
         EditTitle = (EditText) findViewById(R.id.EditTitle);
         EditContent = (EditText) findViewById(R.id.EditContent);
@@ -162,9 +167,13 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         list = (LinearLayout) findViewById(R.id.list);
         paper = (ConstraintLayout) findViewById(R.id.paper);
         paper.setVisibility(View.INVISIBLE);
+        repContent =(EditText) findViewById(R.id.repContent);
+        repTitle =(EditText) findViewById(R.id.repTitle);
+        report = (ConstraintLayout) findViewById(R.id.report);
+        report.setVisibility(View.INVISIBLE);
 
 
-        Search.setOnClickListener(new View.OnClickListener() {
+        Search.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -185,7 +194,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         });
 
 
-        refresh.setOnClickListener(new View.OnClickListener() {
+        refresh.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -199,7 +208,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         });
 
 
-        post.setOnClickListener(new View.OnClickListener() {
+        post.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 String result;
@@ -223,7 +232,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         });
 
 
-        check.setOnClickListener(new View.OnClickListener() {
+        check.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 geoActivity geo = new geoActivity(EditAdd.getText());
@@ -242,7 +251,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
             }
         });
 
-        Write.setOnClickListener(new View.OnClickListener() {
+        Write.setOnClickListener(new OnClickListener() {
                                      @Override
                                      public void onClick(View v) {
                                          f.bringToFront();
@@ -254,34 +263,40 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                                      }
                                  }
         );
-        x.setOnClickListener(new View.OnClickListener() {
+        x.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 f.setVisibility(View.INVISIBLE);
             }
         });
-        x2.setOnClickListener(new View.OnClickListener() {
+        x2.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 listLayout.setVisibility(View.INVISIBLE);
                 paper.setVisibility(View.INVISIBLE);
             }
         });
-        x3.setOnClickListener(new View.OnClickListener() {
+        x3.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 paper.setVisibility(View.INVISIBLE);
             }
         });
+        x4.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                report.setVisibility(View.INVISIBLE);
+            }
+        });
 
-        up.setOnClickListener(new View.OnClickListener(){
+        up.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v) {
                 String result;
 
                 etcActivity task = new etcActivity();
                 try {
-                    result = task.execute("1", revNum, "", "", "").get();
+                    result = task.execute("1", revNum, getIntent().getStringExtra("nickname"), "", "").get();
                     Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
@@ -291,25 +306,38 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
             }
         });
 
-        report.setOnClickListener(new View.OnClickListener(){
+        reportBtn.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v) {
-                String result;
-                String title;
-                String content;
-                String time;
-                String reviewnum;
+                report.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        repBtn.setOnClickListener(new View.OnClickListener(){
+            String result;
+            @Override
+            public void onClick(View v) {
+                LocalDateTime now = LocalDateTime.now();
+                String title = String.valueOf(repTitle.getText());
+                String content = String.valueOf(repTitle.getText());
+                String fNow = now.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분 ss초"));
+
                 //신고하기 누르면 간단하게 나오는 창을 만들고 해당 정보들 가져오기
                 etcActivity task = new etcActivity();
-                /*try {
-                    result = task.execute("2", title, content, time, reviewnum).get();
+                try {
+                    result = task.execute("2", title, content, fNow, revNum).get();
+                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }*/
+                }
+
+                report.setVisibility(View.INVISIBLE);
             }
         });
+
     }
 
 
@@ -577,7 +605,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                 Button b = new Button(this);
                 b.setText("제목 : " + dbinfo.get(i)[1] + "\n작성자 : " + dbinfo.get(i)[5] + "\t추천 :" + dbinfo.get(i)[8] +"\n작성일 : " + dbinfo.get(i)[7]);
                 int tempI = i;
-                b.setOnClickListener(new View.OnClickListener() {
+                b.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         revNum = String.valueOf(dbinfo.get(tempI)[0]);

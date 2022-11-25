@@ -10,6 +10,7 @@
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="-42dp"
         tools:layout_editor_absoluteY="56dp">
+
     </RelativeLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -272,6 +273,85 @@
         app:layout_constraintVertical_bias="0.491"
         tools:visibility="invisible">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/report"
+            android:layout_width="317dp"
+            android:layout_height="220dp"
+            android:background="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="@+id/cont"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.496"
+            tools:visibility="invisible">
+
+            <ImageButton
+                android:id="@+id/XButton4"
+                android:layout_width="32dp"
+                android:layout_height="30dp"
+                android:layout_gravity="right"
+                android:scaleType="fitCenter"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.001"
+                app:srcCompat="@drawable/x" />
+
+            <EditText
+                android:id="@+id/repContent"
+                android:layout_width="315dp"
+                android:layout_height="81dp"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="내용"
+                android:inputType="textMultiLine"
+                app:layout_constraintBottom_toBottomOf="@+id/repBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.661" />
+
+            <TextView
+                android:id="@+id/repInfo"
+                android:layout_width="55dp"
+                android:layout_height="26dp"
+                android:text="신 고"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.534"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:layout_editor_absoluteY="2dp"
+                tools:ignore="MissingConstraints" />
+
+            <EditText
+                android:id="@+id/repTitle"
+                android:layout_width="318dp"
+                android:layout_height="49dp"
+                android:layout_marginTop="28dp"
+                android:ems="10"
+                android:hint="제목"
+                android:inputType="textPersonName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/repBtn"
+                android:layout_width="98dp"
+                android:layout_height="35dp"
+                android:background="@drawable/border"
+                android:text="신고"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.972" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <ImageButton
             android:id="@+id/XButton3"
             android:layout_width="32dp"
@@ -290,7 +370,7 @@
 
         <TextView
             android:id="@+id/titleday"
-            android:layout_width="330dp"
+            android:layout_width="336dp"
             android:layout_height="69dp"
             android:layout_marginTop="44dp"
             android:text="TextView"
@@ -302,15 +382,15 @@
 
         <TextView
             android:id="@+id/cont"
-            android:layout_width="321dp"
-            android:layout_height="529dp"
+            android:layout_width="319dp"
+            android:layout_height="530dp"
             android:background="#00000000"
             android:text="TextView"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.811"
             tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="29dp" />
+            tools:layout_editor_absoluteX="31dp" />
 
         <Button
             android:id="@+id/upBtn"
@@ -325,7 +405,7 @@
             app:layout_constraintVertical_bias="0.99" />
 
         <Button
-            android:id="@+id/report"
+            android:id="@+id/reportBtn"
             android:layout_width="82dp"
             android:layout_height="36dp"
             android:text="신고하기"
@@ -334,7 +414,8 @@
             app:layout_constraintHorizontal_bias="0.892"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.99" />
+            app:layout_constraintVertical_bias="0.99"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
