@@ -44,9 +44,9 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
     private ViewGroup mapViewContainer;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    Button Search, post, check;
+    Button Search, post, check, up, report;
     ImageButton Write, x, refresh, x2, x3;
-    String nickname, address;
+    String nickname, address, revNum;
     EditText EditTitle, EditContent, EditAdd;
     TextView text, textv, titleday, cont;
     Double lon = 700.0, lat = 700.0;
@@ -100,7 +100,7 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                 for (int i = 0; i < sp.length; i++) {
                     temp = sp[i].split("§§§§§§§%~#");
 
-                    dbinfo.add(new String[]{temp[0],temp[1],temp[2],temp[3],temp[4], temp[5], temp[6], temp[7]});
+                    dbinfo.add(new String[]{temp[0],temp[1],temp[2],temp[3],temp[4], temp[5], temp[6], temp[7], temp[8]});
 
                     int n = Integer.parseInt(temp[0]); // 리뷰번호
                     String title = temp[1]; //제목
@@ -110,7 +110,8 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                     String nick = temp[5];
                     String add = temp[6];
                     String fNow = temp[7];
-
+                    int up = Integer.parseInt(temp[8]); //추천수
+                    
                     MapPOIItem marker = new MapPOIItem();
                     MapPoint mp = MapPoint.mapPointWithGeoCoord(lon, lat);
 
@@ -138,6 +139,8 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
 
     void init() {
         Search = (Button) findViewById(R.id.searchBtn);
+        up = (Button) findViewById(R.id.upBtn);
+        report = (Button) findViewById(R.id.report);
         check = (Button) findViewById(R.id.checkAdd);
         post = (Button) findViewById(R.id.regPost);
         text = (TextView) findViewById(R.id.address);
@@ -268,6 +271,43 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
             @Override
             public void onClick(View v) {
                 paper.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        up.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                String result;
+
+                etcActivity task = new etcActivity();
+                try {
+                    result = task.execute("1", revNum, "", "", "").get();
+                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        report.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                String result;
+                String title;
+                String content;
+                String time;
+                String reviewnum;
+                //신고하기 누르면 간단하게 나오는 창을 만들고 해당 정보들 가져오기
+                etcActivity task = new etcActivity();
+                /*try {
+                    result = task.execute("2", title, content, time, reviewnum).get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }*/
             }
         });
     }
@@ -535,11 +575,12 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                 listLayout.bringToFront();
                 listLayout.setVisibility(View.VISIBLE);
                 Button b = new Button(this);
-                b.setText("제목 : " + dbinfo.get(i)[1] + "\n작성자 : " + dbinfo.get(i)[5] + "\n작성일 : " + dbinfo.get(i)[7]);
+                b.setText("제목 : " + dbinfo.get(i)[1] + "\n작성자 : " + dbinfo.get(i)[5] + "\t추천 :" + dbinfo.get(i)[8] +"\n작성일 : " + dbinfo.get(i)[7]);
                 int tempI = i;
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        revNum = String.valueOf(dbinfo.get(tempI)[0]);
                         titleday.setText("제목 : " + dbinfo.get(tempI)[1] + "\n작성자 : " + dbinfo.get(tempI)[5] + "\n작성일 : " + dbinfo.get(tempI)[7]);
                         cont.setText(dbinfo.get(tempI)[2]);
                         paper.bringToFront();

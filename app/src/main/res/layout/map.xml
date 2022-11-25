@@ -261,8 +261,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/paper"
-        android:layout_width="379dp"
-        android:layout_height="672dp"
+        android:layout_width="387dp"
+        android:layout_height="707dp"
         android:background="@drawable/paper2"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -270,7 +270,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.491"
-        tools:visibility="visible">
+        tools:visibility="invisible">
 
         <ImageButton
             android:id="@+id/XButton3"
@@ -313,7 +313,7 @@
             tools:layout_editor_absoluteX="29dp" />
 
         <Button
-            android:id="@+id/gachu"
+            android:id="@+id/upBtn"
             android:layout_width="82dp"
             android:layout_height="36dp"
             android:text="추천"

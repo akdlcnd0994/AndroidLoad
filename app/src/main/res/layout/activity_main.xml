@@ -78,4 +78,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.734" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/reviewCheck"
+        android:layout_width="372dp"
+        android:layout_height="681dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="278dp"
+            android:layout_height="81dp"
+            android:layout_marginTop="24dp"
+            android:text="만들것\nmap에 있는 것 처럼 자기가 쓴 글 다 보여주기\n계정관리 누르면 자기 정보보여주기"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

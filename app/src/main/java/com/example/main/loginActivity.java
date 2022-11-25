@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.w3c.dom.Text;
 
 public class loginActivity extends AppCompatActivity {
-    Button login;
+    Button login, find;
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
@@ -32,6 +32,7 @@ public class loginActivity extends AppCompatActivity {
 
     public void initializeView(){
         Button btn = (Button)findViewById(R.id.register);
+        Button find = (Button)findViewById(R.id.find);
         login = (Button)findViewById(R.id.login);
         EditText EditID = (EditText)findViewById(R.id.ID);
         EditText EditPW = (EditText)findViewById(R.id.PW);
@@ -81,5 +82,12 @@ public class loginActivity extends AppCompatActivity {
             }
         });
 
+        find.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), findActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
