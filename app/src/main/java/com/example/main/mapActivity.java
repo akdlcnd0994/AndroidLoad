@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
@@ -37,16 +38,18 @@ import net.daum.mf.map.api.MapView;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.EventListener;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
 public class mapActivity extends AppCompatActivity implements MapView.CurrentLocationEventListener, MapView.MapViewEventListener, MapView.POIItemEventListener {
     private static final String LOG_TAG = "mapActivity";
     private MapView mapView;
+    private Location lastKnownLocation =null;
     private ViewGroup mapViewContainer;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
+    LocationManager mLocationManager;
     Button Search, post, check, up, reportBtn, repBtn;
     ImageButton Write, x, refresh, x2, x3, x4;
     String nickname, address, revNum;
@@ -73,9 +76,6 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
 
         mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
 
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        @SuppressLint("MissingPermission") Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(location.getLatitude(), location.getLongitude()), true);
 
 
         if (!checkLocationServicesStatus()) {
@@ -83,9 +83,36 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         } else {
             checkRunTimePermission();
         }
+
+
+
+        Location myLocation = getLastKnownLocation();
+        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(myLocation.getLatitude(),myLocation.getLongitude()), true);
+
+
+
         marking();
         init();
+
     }
+
+    private Location getLastKnownLocation() {
+        mLocationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            @SuppressLint("MissingPermission") Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
+    }
+
 
     void marking() {
         String[] sp;
@@ -153,8 +180,8 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
         refresh = (ImageButton) findViewById(R.id.refresh);
         Write = (ImageButton) findViewById(R.id.writeButton);
         x = (ImageButton) findViewById(R.id.XButton);
-        x2 = (ImageButton) findViewById(R.id.XButton2);
-        x3 = (ImageButton) findViewById(R.id.XButton3);
+        x2 = (ImageButton) findViewById(R.id.XB2);
+        x3 = (ImageButton) findViewById(R.id.XB1);
         x4 = (ImageButton) findViewById(R.id.XButton4);
         f = (ConstraintLayout) findViewById(R.id.frame);
         EditTitle = (EditText) findViewById(R.id.EditTitle);

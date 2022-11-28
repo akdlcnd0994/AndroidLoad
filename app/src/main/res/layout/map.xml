@@ -148,7 +148,7 @@
         <!--marginTop으로 윗쪽 여백 주고 게시판 내부에서 이용되는 리스트용 레이아웃-->
 
         <ImageButton
-            android:id="@+id/XButton2"
+            android:id="@+id/XB2"
             android:layout_width="32dp"
             android:layout_height="30dp"
             android:layout_gravity="right"
@@ -353,7 +353,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageButton
-            android:id="@+id/XButton3"
+            android:id="@+id/XB1"
             android:layout_width="32dp"
             android:layout_height="30dp"
             android:layout_gravity="right"
