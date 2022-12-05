@@ -640,7 +640,6 @@ public class mapActivity extends AppCompatActivity implements MapView.CurrentLoc
                         cont.setText(dbinfo.get(tempI)[2]);
                         paper.bringToFront();
                         paper.setVisibility(View.VISIBLE);
-
                     }
                 });
 
